@@ -121,3 +121,63 @@ export function getTimeUntilReset(): string {
   
   return `${hours}h ${minutes}m`;
 }
+
+export function calculateFocusScore(minutesFocused: number, livesRemaining: number): number {
+  // Focus Score Formula: (minutes focused × 10) + (remaining lives × 20)
+  return (minutesFocused * 10) + (livesRemaining * 20);
+}
+
+// Streak tracking functions
+export function updateDailyStreak(): number {
+  const user = getUser();
+  const dailyStats = getDailyStats();
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Check if user completed at least one session today
+  if (dailyStats.sessionsCompleted > 0) {
+    // Check if yesterday was also completed
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    
+    if (user.lastStudyDate === yesterdayStr) {
+      // Continue streak
+      user.dailyStreak += 1;
+    } else if (user.lastStudyDate !== today) {
+      // Start new streak
+      user.dailyStreak = 1;
+    }
+    
+    user.lastStudyDate = today;
+    saveUser(user);
+  }
+  
+  return user.dailyStreak;
+}
+
+export function updatePerfectFocusStreak(): number {
+  const user = getUser();
+  const dailyStats = getDailyStats();
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Perfect day = at least 1 session with 0 lives lost
+  if (dailyStats.perfectSessions > 0 && dailyStats.livesLost === 0) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    
+    if (user.lastStudyDate === yesterdayStr) {
+      // Continue perfect streak
+      user.perfectFocusStreak += 1;
+    } else if (user.lastStudyDate !== today) {
+      // Start new perfect streak
+      user.perfectFocusStreak = 1;
+    }
+  } else if (dailyStats.sessionsCompleted > 0) {
+    // Reset perfect streak if had sessions but lost lives
+    user.perfectFocusStreak = 0;
+  }
+  
+  saveUser(user);
+  return user.perfectFocusStreak;
+}

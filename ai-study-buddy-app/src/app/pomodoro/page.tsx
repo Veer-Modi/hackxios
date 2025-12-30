@@ -17,18 +17,37 @@ import {
   getTimerState,
   POMODORO_DURATION 
 } from '@/lib/timer';
+<<<<<<< HEAD
 import { loseLife, loseLifeAsync, canStartSession, canStartSessionAsync, getTimeUntilReset } from '@/lib/life-system';
 import { createFocusDetector } from '@/lib/focus-detection';
 import { checkDailyReset, getUser, getDailyStats, getLifeSystem, checkDailyResetAsync, getUserAsync, getDailyStatsAsync, getLifeSystemAsync } from '@/lib/storage';
 import { PomodoroSession, User, DailyStats, LifeSystem } from '@/types';
 
 export default function PomodoroPage() {
+=======
+import { loseLife, canStartSession, getTimeUntilReset, calculateFocusScore } from '@/lib/life-system';
+import { createFocusDetector } from '@/lib/focus-detection';
+import { checkDailyReset, getUser, getDailyStats, getLifeSystem } from '@/lib/storage';
+import { PomodoroSession, User, DailyStats, LifeSystem } from '@/types';
+
+// Dummy leaderboard data
+const DUMMY_LEADERBOARD = [
+  { rank: 1, name: "Alex Chen", score: 850 },
+  { rank: 2, name: "Sarah Kim", score: 720 },
+  { rank: 3, name: "Mike Johnson", score: 680 },
+  { rank: 4, name: "Emma Davis", score: 650 },
+  { rank: 5, name: "You", score: 420 }
+];
+
+export default function PomodoroRoom() {
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
   // State management
   const [currentSession, setCurrentSession] = useState<PomodoroSession | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [dailyStats, setDailyStats] = useState<DailyStats | null>(null);
   const [lifeSystem, setLifeSystem] = useState<LifeSystem | null>(null);
   const [showLifeWarning, setShowLifeWarning] = useState(false);
+<<<<<<< HEAD
   
   // Refs for cleanup
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -44,6 +63,21 @@ export default function PomodoroPage() {
     };
     
     initializeData();
+=======
+  const [showResults, setShowResults] = useState(false);
+  const [sessionScore, setSessionScore] = useState(0);
+  
+  // Refs for cleanup
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const focusDetectorRef = useRef<any>(null);
+
+  // Initialize data on component mount
+  useEffect(() => {
+    checkDailyReset();
+    setUser(getUser());
+    setDailyStats(getDailyStats());
+    setLifeSystem(getLifeSystem());
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
   }, []);
 
   // Timer update effect
@@ -99,8 +133,13 @@ export default function PomodoroPage() {
     };
   }, [currentSession]);
 
+<<<<<<< HEAD
   const handleStartSession = async () => {
     if (!(await canStartSessionAsync())) {
+=======
+  const handleStartSession = () => {
+    if (!canStartSession()) {
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
       alert("You're blocked! Wait until tomorrow to start a new session.");
       return;
     }
@@ -108,6 +147,10 @@ export default function PomodoroPage() {
     const newSession = createNewSession();
     const startedSession = startSession(newSession);
     setCurrentSession(startedSession);
+<<<<<<< HEAD
+=======
+    setShowResults(false);
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
   };
 
   const handlePauseSession = () => {
@@ -134,13 +177,27 @@ export default function PomodoroPage() {
     }
   };
 
+<<<<<<< HEAD
   const handleSessionComplete = async () => {
     // Update daily stats
     if (dailyStats && user && currentSession) {
+=======
+  const handleSessionComplete = () => {
+    if (!currentSession || !lifeSystem) return;
+
+    // Calculate focus score: (minutes focused × 10) + (remaining lives × 20)
+    const minutesFocused = Math.floor((POMODORO_DURATION - currentSession.timeRemaining) / (1000 * 60));
+    const score = calculateFocusScore(minutesFocused, lifeSystem.livesRemaining);
+    setSessionScore(score);
+
+    // Update daily stats
+    if (dailyStats) {
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
       const updatedStats = {
         ...dailyStats,
         sessionsCompleted: dailyStats.sessionsCompleted + 1,
         totalFocusTime: dailyStats.totalFocusTime + 25,
+<<<<<<< HEAD
         perfectSessions: currentSession.livesLost === 0 ? dailyStats.perfectSessions + 1 : dailyStats.perfectSessions
       };
       setDailyStats(updatedStats);
@@ -166,6 +223,16 @@ export default function PomodoroPage() {
       }
     }
 
+=======
+        perfectSessions: currentSession?.livesLost === 0 ? dailyStats.perfectSessions + 1 : dailyStats.perfectSessions
+      };
+      setDailyStats(updatedStats);
+    }
+
+    // Show results
+    setShowResults(true);
+
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
     // Clean up focus detector
     if (focusDetectorRef.current) {
       focusDetectorRef.current.stop();
@@ -173,7 +240,11 @@ export default function PomodoroPage() {
     }
   };
 
+<<<<<<< HEAD
   const handleFocusLost = async () => {
+=======
+  const handleFocusLost = () => {
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
     if (!currentSession || getTimerState(currentSession) !== 'running') return;
     
     // Pause the session
@@ -184,10 +255,17 @@ export default function PomodoroPage() {
     });
 
     // Lose a life
+<<<<<<< HEAD
     const result = await loseLifeAsync();
     setLifeSystem(await getLifeSystemAsync());
     setUser(await getUserAsync());
     setDailyStats(await getDailyStatsAsync());
+=======
+    const result = loseLife();
+    setLifeSystem(getLifeSystem());
+    setUser(getUser());
+    setDailyStats(getDailyStats());
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
     setShowLifeWarning(true);
 
     // Hide warning after 3 seconds
@@ -205,6 +283,10 @@ export default function PomodoroPage() {
 
   const handleNewSession = () => {
     setCurrentSession(null);
+<<<<<<< HEAD
+=======
+    setShowResults(false);
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
   };
 
   if (!user || !dailyStats || !lifeSystem) {
@@ -219,6 +301,7 @@ export default function PomodoroPage() {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
+<<<<<<< HEAD
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             🍅 FocusGuard Pomodoro Arena
           </h1>
@@ -228,6 +311,20 @@ export default function PomodoroPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+=======
+          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+            ← Back to Dashboard
+          </Link>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            🍅 Pomodoro Room
+          </h1>
+          <p className="text-gray-600">
+            Focus-enforced timer with life system
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
           {/* Main Timer Section */}
           <div className="lg:col-span-2">
             <Card title="Pomodoro Timer">
@@ -286,13 +383,37 @@ export default function PomodoroPage() {
                   </Button>
                 )}
               </div>
+<<<<<<< HEAD
+=======
+
+              {/* Session Results */}
+              {showResults && (
+                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <h3 className="text-lg font-semibold text-green-800 mb-2">
+                    🎉 Session Complete!
+                  </h3>
+                  <div className="text-green-700">
+                    <p className="text-2xl font-bold">Focus Score: {sessionScore}</p>
+                    <p className="text-sm mt-1">
+                      Great job! You've earned {sessionScore} points.
+                    </p>
+                  </div>
+                </div>
+              )}
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
             </Card>
           </div>
 
           {/* Sidebar */}
+<<<<<<< HEAD
           <div className="space-y-6">
             {/* Life System */}
             <Card title="Life System">
+=======
+          <div className="lg:col-span-2 space-y-6">
+            {/* Life System */}
+            <Card title="❤️ Life System">
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
               <LifeDisplay 
                 livesRemaining={lifeSystem.livesRemaining}
                 showWarning={showLifeWarning}
@@ -306,6 +427,7 @@ export default function PomodoroPage() {
                   </p>
                 </div>
               )}
+<<<<<<< HEAD
             </Card>
 
             {/* Focus Rules */}
@@ -332,6 +454,22 @@ export default function PomodoroPage() {
 
             {/* Today's Progress */}
             <Card title="Today's Progress">
+=======
+
+              <div className="mt-4 text-sm text-gray-600">
+                <p><strong>Life System Rules:</strong></p>
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>Start with 5 lives daily</li>
+                  <li>Lose 1 life per tab switch</li>
+                  <li>0 lives = blocked until tomorrow</li>
+                  <li>Lives reset at midnight</li>
+                </ul>
+              </div>
+            </Card>
+
+            {/* Daily Stats */}
+            <Card title="📊 Today's Progress">
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Sessions:</span>
@@ -352,6 +490,7 @@ export default function PomodoroPage() {
               </div>
             </Card>
 
+<<<<<<< HEAD
             {/* Quick Links */}
             <Card title="Quick Links">
               <div className="space-y-2">
@@ -365,6 +504,33 @@ export default function PomodoroPage() {
                     👤 Your Profile
                   </Button>
                 </Link>
+=======
+            {/* Leaderboard */}
+            <Card title="🏆 Daily Leaderboard">
+              <div className="space-y-2">
+                {DUMMY_LEADERBOARD.map((player) => (
+                  <div 
+                    key={player.rank}
+                    className={`flex justify-between items-center p-2 rounded ${
+                      player.name === 'You' ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`font-bold ${
+                        player.rank === 1 ? 'text-yellow-600' :
+                        player.rank === 2 ? 'text-gray-600' :
+                        player.rank === 3 ? 'text-orange-600' : 'text-gray-500'
+                      }`}>
+                        #{player.rank}
+                      </span>
+                      <span className={player.name === 'You' ? 'font-semibold text-blue-700' : ''}>
+                        {player.name}
+                      </span>
+                    </div>
+                    <span className="font-semibold">{player.score}</span>
+                  </div>
+                ))}
+>>>>>>> 6843f05f19f2701fb3752d9c7fdcb19727c1d911
               </div>
             </Card>
           </div>
