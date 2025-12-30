@@ -1,72 +1,162 @@
-import { NextRequest } from 'next/server';
-import { PomodoroSession } from '@/types';
-
-// In-memory storage for demo purposes (in production, use a database)
-let sessions: PomodoroSession[] = [];
+import { NextRequest, NextResponse } from 'next/server';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSessionsCollection } from '@/lib/mongodb';
+import { PomodoroSession } from '@/models/pomodoroSession';
 
 export async function GET(request: NextRequest) {
   try {
-    // Filter out completed sessions older than 30 days for demo purposes
-    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-    sessions = sessions.filter(session => 
-      session.completed ? (session.endTime && session.endTime > thirtyDaysAgo) : true
-    );
+    const userSession = await getUserFromRequest(request);
+    if (!userSession) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
 
-    return Response.json(sessions);
+    const sessions = await getSessionsCollection();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Get user's sessions from last 30 days
+    const userSessions = await sessions.find({
+      userId: userSession.id as any,
+      createdAt: { $gte: thirtyDaysAgo }
+    }).sort({ createdAt: -1 }).toArray();
+
+    return NextResponse.json(userSessions);
   } catch (error) {
     console.error('Error fetching sessions:', error);
-    return Response.json({ error: 'Failed to fetch sessions' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch sessions' },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const sessionData: PomodoroSession = await request.json();
-    
-    // Add the new session to the list
-    sessions.push(sessionData);
-    
-    return Response.json(sessionData, { status: 201 });
+    const userSession = await getUserFromRequest(request);
+    if (!userSession) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const sessionData = await request.json();
+    const sessions = await getSessionsCollection();
+
+    const newSession: PomodoroSession = {
+      userId: userSession.id as any,
+      startTime: sessionData.startTime ? new Date(sessionData.startTime) : new Date(),
+      minutesFocused: sessionData.minutesFocused || 0,
+      livesLostDuringSession: sessionData.livesLostDuringSession || 0,
+      focusScore: sessionData.focusScore || 0,
+      completed: sessionData.completed || false,
+      createdAt: new Date()
+    };
+
+    const result = await sessions.insertOne(newSession);
+    const insertedSession = await sessions.findOne({ _id: result.insertedId as any });
+
+    return NextResponse.json(insertedSession, { status: 201 });
   } catch (error) {
     console.error('Error creating session:', error);
-    return Response.json({ error: 'Failed to create session' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to create session' },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const sessionData: PomodoroSession = await request.json();
-    
-    // Find and update the session
-    const index = sessions.findIndex(session => session.id === sessionData.id);
-    if (index !== -1) {
-      sessions[index] = sessionData;
-      return Response.json(sessionData);
-    } else {
-      // If session doesn't exist, create it
-      sessions.push(sessionData);
-      return Response.json(sessionData, { status: 201 });
+    const userSession = await getUserFromRequest(request);
+    if (!userSession) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
     }
+
+    const sessionData = await request.json();
+    const sessions = await getSessionsCollection();
+
+    if (!sessionData._id) {
+      return NextResponse.json(
+        { error: 'Session ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const { _id, userId, createdAt, ...updateData } = sessionData;
+
+    // Convert date strings to Date objects if present
+    if (updateData.startTime) updateData.startTime = new Date(updateData.startTime);
+    if (updateData.endTime) updateData.endTime = new Date(updateData.endTime);
+
+    const result = await sessions.updateOne(
+      { _id: sessionData._id as any, userId: userSession.id as any },
+      { $set: updateData }
+    );
+
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    const updatedSession = await sessions.findOne({ _id: sessionData._id as any });
+    return NextResponse.json(updatedSession);
   } catch (error) {
     console.error('Error updating session:', error);
-    return Response.json({ error: 'Failed to update session' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to update session' },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
+    const userSession = await getUserFromRequest(request);
+    if (!userSession) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    
+
     if (!id) {
-      return Response.json({ error: 'Session ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Session ID is required' },
+        { status: 400 }
+      );
     }
-    
-    sessions = sessions.filter(session => session.id !== id);
-    
-    return Response.json({ message: 'Session deleted successfully' });
+
+    const sessions = await getSessionsCollection();
+    const result = await sessions.deleteOne({
+      _id: id as any,
+      userId: userSession.id as any
+    });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message: 'Session deleted successfully' });
   } catch (error) {
     console.error('Error deleting session:', error);
-    return Response.json({ error: 'Failed to delete session' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to delete session' },
+      { status: 500 }
+    );
   }
 }

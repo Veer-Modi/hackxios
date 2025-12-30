@@ -16,18 +16,17 @@ export default function LifeDisplay({ livesRemaining, showWarning = false }: Lif
   
   return (
     <div className="text-center">
-      <div className="text-2xl mb-2">
-        <span className="font-semibold">Lives: </span>
-        <span className="text-3xl">{livesDisplay}</span>
-        <span className="text-gray-600 ml-2">({livesRemaining}/5)</span>
+      <div className="text-3xl mb-3">
+        <span className="text-red-400">{livesDisplay}</span>
+        <span className="text-white/70 ml-2 text-lg">({livesRemaining}/5)</span>
       </div>
       
       {showWarning && livesRemaining < 5 && (
         <div className={`
-          p-3 rounded-lg text-sm font-medium
-          ${livesRemaining <= 1 ? 'bg-red-100 text-red-800' : 
-            livesRemaining <= 2 ? 'bg-orange-100 text-orange-800' : 
-            'bg-yellow-100 text-yellow-800'}
+          p-3 rounded-lg text-sm font-medium animate-life-lost
+          ${livesRemaining <= 1 ? 'bg-red-500/30 text-red-200 border border-red-400/50' : 
+            livesRemaining <= 2 ? 'bg-orange-500/30 text-orange-200 border border-orange-400/50' : 
+            'bg-yellow-500/30 text-yellow-200 border border-yellow-400/50'}
         `}>
           {warningMessage}
         </div>

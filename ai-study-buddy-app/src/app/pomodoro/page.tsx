@@ -208,29 +208,33 @@ const result = await loseLifeAsync();
   };
 
   if (!user || !dailyStats || !lifeSystem) {
-    return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
   }
 
   const timerState = getTimerState(currentSession);
   const canStart = canStartSession();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="min-h-screen py-8 bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-<h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl md:text-5xl font-bold mb-2 gradient-text">
             🍅 FocusGuard Pomodoro Arena
           </h1>
-          <p className="text-gray-600">
+          <p className="text-white/80 text-lg">
             Stay focused, build streaks, and earn rewards!
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Timer Section */}
+          {/* Main Timer Section - CENTER FOCUS */}
           <div className="lg:col-span-2">
-            <Card title="Pomodoro Timer">
+            <Card className="glass-strong">
               <TimerDisplay
                 timeRemaining={currentSession?.timeRemaining || POMODORO_DURATION}
                 state={timerState}
@@ -238,7 +242,7 @@ const result = await loseLifeAsync();
               />
               
               {/* Timer Controls */}
-              <div className="flex justify-center gap-4 mt-6">
+              <div className="flex justify-center gap-4 mt-8">
                 {timerState === 'idle' && (
                   <Button 
                     onClick={handleStartSession}
@@ -286,48 +290,44 @@ const result = await loseLifeAsync();
                   </Button>
                 )}
               </div>
-
             </Card>
           </div>
 
-          {/* Sidebar */}
-<div className="space-y-6">
-            {/* Life System */}
-            <Card title="Life System">
+          {/* Sidebar - Discipline & Motivation */}
+          <div className="space-y-6">
+            {/* Life System - LEFT PANEL (Discipline) */}
+            <Card title="❤️ Lives" className={showLifeWarning ? 'animate-shake' : ''}>
               <LifeDisplay 
                 livesRemaining={lifeSystem.livesRemaining}
                 showWarning={showLifeWarning}
               />
               
               {user.isBlocked && (
-                <div className="mt-4 p-4 bg-red-100 border border-red-200 rounded-lg">
-                  <p className="text-red-800 font-semibold">🚫 Blocked!</p>
-                  <p className="text-red-600 text-sm mt-1">
+                <div className="mt-4 p-4 bg-red-500/20 border border-red-400/50 rounded-lg">
+                  <p className="text-red-300 font-semibold">🚫 Blocked!</p>
+                  <p className="text-red-200 text-sm mt-1">
                     Reset in: {getTimeUntilReset()}
                   </p>
                 </div>
               )}
-</Card>
+            </Card>
 
-            {/* Focus Rules */}
-            <Card title="Focus Rules">
-              <div className="space-y-3 text-sm">
-                <div className="flex items-start">
-                  <span className="text-red-500 mr-2">•</span>
-                  <span>Switching tabs costs 1 life</span>
+            {/* Motivation Panel - RIGHT */}
+            <Card title="🔥 Focus Streak">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-orange-400 mb-2 animate-pulse-glow">
+                  🔥 {user.dailyStreak || 0}
                 </div>
-                <div className="flex items-start">
-                  <span className="text-red-500 mr-2">•</span>
-                  <span>Minimizing window costs 1 life</span>
+                <p className="text-white/70 text-sm">Daily Streak</p>
+              </div>
+            </Card>
+
+            <Card title="📅 Daily Streak">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-teal-400 mb-2">
+                  📅 {dailyStats.sessionsCompleted}
                 </div>
-                <div className="flex items-start">
-                  <span className="text-red-500 mr-2">•</span>
-                  <span>Focus on this tab to earn rewards</span>
-                </div>
-                <div className="flex items-start">
-                  <span className="text-green-500 mr-2">•</span>
-                  <span>Complete sessions to build streaks</span>
-                </div>
+                <p className="text-white/70 text-sm">Sessions Today</p>
               </div>
             </Card>
 
@@ -335,25 +335,47 @@ const result = await loseLifeAsync();
             <Card title="Today's Progress">
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Sessions:</span>
-                  <span className="font-semibold">{dailyStats.sessionsCompleted}</span>
+                  <span className="text-white/70">Sessions:</span>
+                  <span className="font-semibold text-white">{dailyStats.sessionsCompleted}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Focus Time:</span>
-                  <span className="font-semibold">{dailyStats.totalFocusTime}m</span>
+                  <span className="text-white/70">Focus Time:</span>
+                  <span className="font-semibold text-green-400">{dailyStats.totalFocusTime}m</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Lives Lost:</span>
-                  <span className="font-semibold text-red-600">{dailyStats.livesLost}</span>
+                  <span className="text-white/70">Lives Lost:</span>
+                  <span className="font-semibold text-red-400">{dailyStats.livesLost}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Perfect Sessions:</span>
-                  <span className="font-semibold text-green-600">{dailyStats.perfectSessions}</span>
+                  <span className="text-white/70">Perfect Sessions:</span>
+                  <span className="font-semibold text-emerald-400">{dailyStats.perfectSessions}</span>
                 </div>
               </div>
             </Card>
 
-{/* Quick Links */}
+            {/* Focus Rules */}
+            <Card title="Focus Rules">
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start">
+                  <span className="text-red-400 mr-2">•</span>
+                  <span className="text-white/80">Switching tabs costs 1 life</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-red-400 mr-2">•</span>
+                  <span className="text-white/80">Minimizing window costs 1 life</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-green-400 mr-2">•</span>
+                  <span className="text-white/80">Focus on this tab to earn rewards</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-emerald-400 mr-2">•</span>
+                  <span className="text-white/80">Complete sessions to build streaks</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Quick Links */}
             <Card title="Quick Links">
               <div className="space-y-2">
                 <Link href="/leaderboard" className="block">

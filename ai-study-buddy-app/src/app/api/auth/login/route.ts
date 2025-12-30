@@ -1,47 +1,57 @@
-import { NextRequest } from 'next/server';
-import { User } from '@/types';
-
-// In-memory storage for demo purposes (in production, use a database)
-// This should match the users array in the signup route
-const users: User[] = [
-  {
-    id: 'user-1',
-    username: 'Demo User',
-    email: 'demo@example.com',
-    livesRemaining: 5,
-    dailyStreak: 0,
-    perfectFocusStreak: 0,
-    lastStudyDate: new Date().toISOString(),
-    isBlocked: false
-  }
-];
+import { NextRequest, NextResponse } from 'next/server';
+import { getUsersCollection } from '@/lib/mongodb';
+import { verifyPassword, generateToken } from '@/lib/auth';
+import { User } from '@/models/user';
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
     
-    // Find user by email
-    const user = users.find(user => user.email === email);
-    if (!user) {
-      return Response.json({ error: 'Invalid email or password' }, { status: 401 });
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: 'Email and password are required' },
+        { status: 400 }
+      );
     }
     
-    // In a real app, you would verify the password here
-    // For demo purposes, we'll assume the password is correct if the user exists
+    const users = await getUsersCollection();
+    
+    // Find user by email
+    const user = await users.findOne({ email });
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
+    
+    // Verify password
+    const isPasswordValid = await verifyPassword(password, user.password);
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
+    
+    // Generate JWT token
+    const token = generateToken(user);
     
     // Return user info (excluding sensitive data like password)
-    return Response.json({ 
+    return NextResponse.json({ 
       message: 'Login successful', 
       user: { 
-        id: user.id, 
-        username: user.username, 
+        id: user._id, 
+        name: user.name, 
         email: user.email 
       },
-      // In a real app, you would generate and return a JWT token
-      token: `fake-jwt-token-${user.id}`
+      token
     });
   } catch (error) {
     console.error('Error logging in:', error);
-    return Response.json({ error: 'Failed to login' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to login' },
+      { status: 500 }
+    );
   }
 }

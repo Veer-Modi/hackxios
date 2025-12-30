@@ -35,44 +35,44 @@ export default function TimerDisplay({
   const getStateColor = () => {
     switch (state) {
       case 'running':
-        return 'text-green-600';
+        return 'text-green-400';
       case 'paused':
-        return 'text-yellow-600';
+        return 'text-yellow-400';
       case 'completed':
-        return 'text-blue-600';
+        return 'text-cyan-400';
       case 'stopped':
-        return 'text-red-600';
+        return 'text-red-400';
       default:
-        return 'text-gray-600';
+        return 'text-white/70';
     }
   };
   
   return (
     <div className="text-center">
       {/* Session Info */}
-      <div className="text-sm text-gray-600 mb-2">
+      <div className="text-sm text-white/70 mb-4">
         Session {sessionNumber} of today
       </div>
       
-      {/* Timer Display */}
-      <div className="bg-gray-100 rounded-lg p-8 mb-4">
-        <div className="text-6xl font-mono font-bold text-gray-900 mb-2">
+      {/* Timer Display - Large numbers with gradient */}
+      <div className="mb-6">
+        <div className="text-7xl md:text-8xl font-mono font-bold gradient-text mb-4 animate-pulse-glow">
           {formatTime(timeRemaining)}
         </div>
       </div>
       
       {/* State Display */}
-      <div className={`text-lg font-semibold ${getStateColor()}`}>
+      <div className={`text-xl font-semibold mb-6 ${getStateColor()}`}>
         {getStateDisplay()}
       </div>
       
       {/* Focus Message */}
       {state === 'running' && (
-        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-blue-800 font-medium">
+        <div className="mt-6 p-4 bg-cyan-500/20 border border-cyan-400/50 rounded-xl">
+          <p className="text-white font-medium">
             Stay focused on this tab! 👀
           </p>
-          <p className="text-blue-600 text-sm mt-1">
+          <p className="text-white/80 text-sm mt-1">
             Switching tabs will pause your timer and cost you a life ❤️
           </p>
         </div>

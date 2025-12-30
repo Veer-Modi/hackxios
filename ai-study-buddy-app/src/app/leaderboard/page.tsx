@@ -45,22 +45,22 @@ export default function LeaderboardPage() {
   }, [view]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen py-8 bg-slate-900">
+      <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">🏆 Leaderboard</h1>
-          <p className="text-gray-600">See how you rank against other focused learners</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-2 gradient-text">🏆 Leaderboard</h1>
+          <p className="text-white/80 text-lg">See how you rank against other focused learners</p>
         </div>
 
         {/* View Toggle */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex rounded-md shadow-sm" role="group">
+          <div className="inline-flex rounded-xl shadow-lg overflow-hidden" role="group">
             <button
               type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
+              className={`px-6 py-2 text-sm font-medium transition-all ${
                 view === 'global'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
               onClick={() => setView('global')}
             >
@@ -68,10 +68,10 @@ export default function LeaderboardPage() {
             </button>
             <button
               type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-r-md ${
+              className={`px-6 py-2 text-sm font-medium transition-all ${
                 view === 'room'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
               onClick={() => setView('room')}
             >
@@ -83,30 +83,30 @@ export default function LeaderboardPage() {
         {/* Leaderboard Card */}
         <Card>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-white/10">
+              <thead>
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Rank
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Name
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Focus Score
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Daily Streak
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Perfect Streak
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-white/10">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-4 text-center text-white/50">
                       Loading leaderboard...
                     </td>
                   </tr>
@@ -114,31 +114,37 @@ export default function LeaderboardPage() {
                   leaderboard.map((entry) => (
                     <tr 
                       key={entry.id} 
-                      className={entry.name === 'You' ? 'bg-blue-50' : ''}
+                      className={`${
+                        entry.name === 'You' ? 'bg-cyan-500/20' : ''
+                      } ${
+                        entry.rank === 1 ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20' :
+                        entry.rank === 2 ? 'bg-gradient-to-r from-gray-400/20 to-slate-400/20' :
+                        entry.rank === 3 ? 'bg-gradient-to-r from-orange-600/20 to-amber-600/20' : ''
+                      }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <span className={`text-sm font-medium ${
-                            entry.rank === 1 ? 'text-yellow-600' : 
-                            entry.rank === 2 ? 'text-gray-400' : 
-                            entry.rank === 3 ? 'text-yellow-800' : 'text-gray-900'
+                          <span className={`text-lg font-bold ${
+                            entry.rank === 1 ? 'text-yellow-400' : 
+                            entry.rank === 2 ? 'text-gray-300' : 
+                            entry.rank === 3 ? 'text-orange-400' : 'text-white'
                           }`}>
-                            {entry.rank}
+                            #{entry.rank}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
+                            <div className="bg-gradient-to-br from-indigo-400 to-purple-400 rounded-xl w-10 h-10 border-2 border-white/30" />
                           </div>
                           <div className="ml-4">
                             <div className={`text-sm font-medium ${
-                              entry.name === 'You' ? 'text-blue-600 font-semibold' : 'text-gray-900'
+                              entry.name === 'You' ? 'text-cyan-300 font-semibold' : 'text-white'
                             }`}>
                               {entry.name}
                               {entry.name === 'You' && (
-                                <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-500/30 text-cyan-200 border border-cyan-400/50">
                                   You
                                 </span>
                               )}
@@ -147,13 +153,13 @@ export default function LeaderboardPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 font-semibold">{entry.focusScore}</div>
+                        <div className="text-sm text-white font-semibold">{entry.focusScore}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">🔥 {entry.dailyStreak}</div>
+                        <div className="text-sm text-orange-400">🔥 {entry.dailyStreak}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">⭐ {entry.perfectStreak}</div>
+                        <div className="text-sm text-yellow-400">⭐ {entry.perfectStreak}</div>
                       </td>
                     </tr>
                   ))
@@ -165,17 +171,17 @@ export default function LeaderboardPage() {
 
         {/* Stats Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <Card className="text-center">
-            <div className="text-2xl font-bold text-blue-600">1250</div>
-            <div className="text-sm text-gray-600">Your Focus Score</div>
+          <Card className="text-center border-t-4 border-cyan-400">
+            <div className="text-3xl font-bold text-cyan-400">1250</div>
+            <div className="text-sm text-white/70">Your Focus Score</div>
           </Card>
-          <Card className="text-center">
-            <div className="text-2xl font-bold text-orange-600">7</div>
-            <div className="text-sm text-gray-600">Daily Streak</div>
+          <Card className="text-center border-t-4 border-orange-400">
+            <div className="text-3xl font-bold text-orange-400">7</div>
+            <div className="text-sm text-white/70">Daily Streak</div>
           </Card>
-          <Card className="text-center">
-            <div className="text-2xl font-bold text-purple-600">3</div>
-            <div className="text-sm text-gray-600">Perfect Streak</div>
+          <Card className="text-center border-t-4 border-purple-400">
+            <div className="text-3xl font-bold text-purple-400">3</div>
+            <div className="text-sm text-white/70">Perfect Streak</div>
           </Card>
         </div>
       </div>

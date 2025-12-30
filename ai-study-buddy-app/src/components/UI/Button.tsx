@@ -1,11 +1,11 @@
-// Simple button component for AI Study Buddy
+// Multi-color gradient button component for AI Study Buddy
 
 import React from 'react';
 
 interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'purple' | 'pink' | 'teal' | 'glass' | 'gradient';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'teal' | 'glass';
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   className?: string;
@@ -21,20 +21,30 @@ export default function Button({
   className = '',
   type = 'button'
 }: ButtonProps) {
-  const baseClasses = 'font-semibold rounded-xl btn-press focus:outline-none focus:ring-2 focus:ring-offset-2';
+  const baseClasses = 'font-semibold rounded-xl btn-press focus:outline-none focus:ring-2 focus:ring-white/50 text-white';
   
   const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
-  primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500',
-  secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 focus:ring-gray-500',
-  danger: 'bg-rose-600 hover:bg-rose-700 text-white focus:ring-rose-500',
-  success: 'bg-emerald-600 hover:bg-emerald-700 text-white focus:ring-emerald-500',
-  warning: 'bg-amber-500 hover:bg-amber-600 text-white focus:ring-amber-400',
-  purple: 'bg-violet-600 hover:bg-violet-700 text-white focus:ring-violet-500',
-  pink: 'bg-pink-600 hover:bg-pink-700 text-white focus:ring-pink-500',
-  teal: 'bg-teal-600 hover:bg-teal-700 text-white focus:ring-teal-500',
-  glass: 'glass text-gray-900 dark:text-gray-100',
-  gradient: 'text-white bg-gradient-to-r from-violet-600 via-fuchsia-600 to-rose-500 hover:from-violet-700 hover:via-fuchsia-700 hover:to-rose-600 animate-gradient focus:ring-fuchsia-500'
-};
+    // Primary: Indigo → Purple (Start, Ask AI, Submit)
+    primary: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 hover:from-indigo-600 hover:via-purple-600 hover:to-fuchsia-600 focus:ring-purple-500 shadow-lg shadow-purple-500/30',
+    
+    // Secondary: Teal → Cyan (Explain Simply, Summarize)
+    secondary: 'bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 hover:from-teal-600 hover:via-cyan-600 hover:to-blue-600 focus:ring-cyan-500 shadow-lg shadow-cyan-500/30',
+    
+    // Danger/Warning: Red → Orange (Reset, Stop)
+    danger: 'bg-gradient-to-r from-red-500 via-orange-500 to-amber-500 hover:from-red-600 hover:via-orange-600 hover:to-amber-600 focus:ring-red-500 shadow-lg shadow-red-500/30',
+    
+    // Success: Green gradient
+    success: 'bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 focus:ring-emerald-500 shadow-lg shadow-emerald-500/30',
+    
+    // Warning: Orange gradient
+    warning: 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 focus:ring-orange-500 shadow-lg shadow-orange-500/30',
+    
+    // Teal: Teal gradient
+    teal: 'bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 focus:ring-teal-500 shadow-lg shadow-teal-500/30',
+    
+    // Glass: Subtle glass effect
+    glass: 'glass text-white hover:bg-white/15 focus:ring-white/30'
+  };
   
   const sizeClasses = {
     small: 'px-3 py-1.5 text-sm',
@@ -43,7 +53,7 @@ export default function Button({
   };
   
   const disabledClasses = disabled 
-    ? 'opacity-50 cursor-not-allowed' 
+    ? 'opacity-50 cursor-not-allowed grayscale' 
     : 'cursor-pointer';
   
   const classes = `

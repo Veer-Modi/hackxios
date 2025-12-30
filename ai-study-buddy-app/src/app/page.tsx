@@ -1,42 +1,72 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import TimerDisplay from '@/components/Timer/TimerDisplay';
-import LifeDisplay from '@/components/LifeSystem/LifeDisplay';
-import Dashboard from '@/components/Dashboard/Dashboard';
 import Button from '@/components/UI/Button';
-import Card from '@/components/UI/Card';
-import { 
-  createNewSession, 
-  startSession, 
-  pauseSession, 
-  resumeSession, 
-  updateSessionTime,
-  completeSession,
-  stopSession,
-  getTimerState,
-  POMODORO_DURATION 
-} from '@/lib/timer';
-import { loseLife, loseLifeAsync, canStartSession, canStartSessionAsync, getTimeUntilReset } from '@/lib/life-system';
-import { createFocusDetector } from '@/lib/focus-detection';
-import { checkDailyReset, getUser, getDailyStats, getLifeSystem, checkDailyResetAsync, getUserAsync, getDailyStatsAsync, getLifeSystemAsync, getTotalStats, getTotalStatsAsync, TotalStats } from '@/lib/storage';
-import { PomodoroSession, User, DailyStats, LifeSystem } from '@/types';
 
 export default function HomePage() {
   const router = useRouter();
 
-  useEffect(() => {
-    // Redirect to dashboard on component mount
-    router.push('/dashboard');
-  }, [router]);
-
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-4xl font-bold text-gray-900 mb-4">🍅 AI Study Buddy</div>
-        <p className="text-gray-600 mb-6">Redirecting to dashboard...</p>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-900">
+      {/* Floating shapes */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-purple-400/20 rounded-full blur-3xl animate-blob"></div>
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-blob" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-indigo-400/20 rounded-full blur-3xl animate-blob" style={{ animationDelay: '4s' }}></div>
+      
+      {/* Hero Section */}
+      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto animate-fade-in-up">
+        <h1 className="text-6xl md:text-7xl font-bold mb-6 gradient-text">
+          Study Smarter.<br />
+          Focus Better.
+        </h1>
+        
+        <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-2xl mx-auto">
+          A calm, colorful, modern digital study room that rewards discipline.
+          <br />
+          <span className="text-lg text-white/60 mt-2 block">
+            FocusGuard Pomodoro Arena
+          </span>
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+          <Button 
+            variant="primary" 
+            size="large"
+            onClick={() => router.push('/dashboard')}
+            className="min-w-[200px]"
+          >
+            Get Started
+          </Button>
+          <Button 
+            variant="secondary" 
+            size="large"
+            onClick={() => router.push('/pomodoro')}
+            className="min-w-[200px]"
+          >
+            Start Pomodoro
+          </Button>
+        </div>
+        
+        {/* Feature highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+          <div className="glass p-6 card-hover">
+            <div className="text-4xl mb-3">🤖</div>
+            <h3 className="text-lg font-semibold text-white mb-2">AI-Powered</h3>
+            <p className="text-white/70 text-sm">Get instant explanations and study help</p>
+          </div>
+          
+          <div className="glass p-6 card-hover">
+            <div className="text-4xl mb-3">🍅</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Focus-Enforced</h3>
+            <p className="text-white/70 text-sm">Pomodoro timer with life system</p>
+          </div>
+          
+          <div className="glass p-6 card-hover">
+            <div className="text-4xl mb-3">🏆</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Gamified</h3>
+            <p className="text-white/70 text-sm">Build streaks and compete</p>
+          </div>
+        </div>
       </div>
     </div>
   );
