@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserFromRequest, calculateStreaks } from '@/lib/auth';
 import { getUsersCollection, getSessionsCollection, getDailyStatsCollection } from '@/lib/mongodb';
-import { DailyStats } from '@/models/DailyStats';
+import { DailyStats } from '@/models/dailyStats';
 
 export async function POST(request: NextRequest) {
   try {
@@ -97,8 +97,8 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date()
       };
 
-      await dailyStats.insertOne(newStats);
-      todayStats = newStats;
+      const insertResult = await dailyStats.insertOne(newStats);
+      todayStats = await dailyStats.findOne({ _id: insertResult.insertedId as any });
     } else {
       // Update existing daily stats
       await dailyStats.updateOne(

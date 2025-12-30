@@ -1,8 +1,8 @@
 // Enhanced MongoDB connection for AI Study Buddy
 import { MongoClient, Db, Collection } from 'mongodb';
-import { User } from '@/models/User';
-import { DailyStats } from '@/models/DailyStats';
-import { PomodoroSession } from '@/models/PomodoroSession';
+import { User } from '@/models/user';
+import { DailyStats } from '@/models/dailyStats';
+import { PomodoroSession } from '@/models/pomodoroSession';
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Please add your MongoDB URI to .env.local');

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import { getUsersCollection, getSessionsCollection } from '@/lib/mongodb';
-import { PomodoroSession } from '@/models/PomodoroSession';
+import { PomodoroSession } from '@/models/pomodoroSession';
 
 export async function POST(request: NextRequest) {
   try {

@@ -6,9 +6,10 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   title?: string;
+  glass?: boolean;
 }
 
-export default function Card({ children, className = '', title }: CardProps) {
+export default function Card({ children, className = '', title, glass = false }: CardProps) {
   return (
     <div className={`bg-white rounded-lg shadow-md border border-gray-200 p-6 ${className}`}>
       {title && (
@@ -18,3 +19,7 @@ export default function Card({ children, className = '', title }: CardProps) {
     </div>
   );
 }
+
+
+
+

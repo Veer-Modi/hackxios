@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen`}>
-        <header className="bg-white shadow-sm border-b">
+        <header className="glass shadow-sm border-b">
           <div className="max-w-6xl mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
               <div>
@@ -68,7 +68,7 @@ export default function RootLayout({
           {children}
         </main>
         
-        <footer className="bg-white border-t mt-16">
+        <footer className="glass border-t mt-16">
           <div className="max-w-4xl mx-auto px-4 py-6 text-center text-gray-600 text-sm">
             Built with Next.js • Stay focused, build habits! 🚀
           </div>
@@ -77,3 +77,6 @@ export default function RootLayout({
     </html>
   );
 }
+
+
+
