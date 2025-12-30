@@ -3,6 +3,7 @@
 export interface User {
   id: string;
   username: string;
+  email?: string;
   livesRemaining: number;
   dailyStreak: number;
   perfectFocusStreak: number;
@@ -43,9 +44,19 @@ export interface LifeSystem {
 
 export type TimerState = 'idle' | 'running' | 'paused' | 'completed' | 'stopped';
 
+export interface TotalStats {
+  totalSessions: number;
+  totalFocusTime: number; // in minutes
+  focusStreak: number;
+  perfectStreak: number;
+  bestDaySessions: number;
+  bestStreak: number;
+}
+
 export interface AppState {
   user: User;
   currentSession: PomodoroSession | null;
   dailyStats: DailyStats;
   lifeSystem: LifeSystem;
+  totalStats: TotalStats;
 }

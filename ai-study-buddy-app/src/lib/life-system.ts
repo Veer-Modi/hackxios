@@ -1,7 +1,41 @@
 // Life system management for AI Study Buddy
 
 import { User, LifeSystem, DailyStats } from '@/types';
-import { getUser, saveUser, getLifeSystem, saveLifeSystem, getDailyStats, saveDailyStats } from './storage';
+import { getUser, saveUser, getLifeSystem, saveLifeSystem, getDailyStats, saveDailyStats, getUserAsync, saveUserAsync, getLifeSystemAsync, saveLifeSystemAsync, getDailyStatsAsync, saveDailyStatsAsync } from './storage';
+
+export async function loseLifeAsync(): Promise<{ success: boolean; livesRemaining: number; isBlocked: boolean }> {
+  const lifeSystem = await getLifeSystemAsync();
+  const user = await getUserAsync();
+  const dailyStats = await getDailyStatsAsync();
+  
+  if (lifeSystem.livesRemaining <= 0) {
+    return { success: false, livesRemaining: 0, isBlocked: true };
+  }
+  
+  // Deduct a life
+  lifeSystem.livesRemaining--;
+  lifeSystem.dailyLivesLost++;
+  
+  // Update daily stats
+  dailyStats.livesLost++;
+  
+  // Check if user should be blocked
+  if (lifeSystem.livesRemaining <= 0) {
+    user.isBlocked = true;
+    user.blockedAt = new Date().toISOString();
+  }
+  
+  // Save all updates
+  await saveLifeSystemAsync(lifeSystem);
+  await saveUserAsync(user);
+  await saveDailyStatsAsync(dailyStats);
+  
+  return {
+    success: true,
+    livesRemaining: lifeSystem.livesRemaining,
+    isBlocked: user.isBlocked
+  };
+}
 
 export function loseLife(): { success: boolean; livesRemaining: number; isBlocked: boolean } {
   const lifeSystem = getLifeSystem();
@@ -59,6 +93,13 @@ export function getLifeWarningMessage(livesRemaining: number): string {
     default:
       return "Stay focused!";
   }
+}
+
+export async function canStartSessionAsync(): Promise<boolean> {
+  const user = await getUserAsync();
+  const lifeSystem = await getLifeSystemAsync();
+  
+  return !user.isBlocked && lifeSystem.livesRemaining > 0;
 }
 
 export function canStartSession(): boolean {

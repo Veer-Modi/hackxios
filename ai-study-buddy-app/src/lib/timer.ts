@@ -1,6 +1,7 @@
 // Timer logic for AI Study Buddy
 
 import { PomodoroSession, TimerState } from '@/types';
+import { createSession as createSessionAPI, updateSession as updateSessionAPI } from './api';
 
 export const POMODORO_DURATION = 25 * 60 * 1000; // 25 minutes in milliseconds
 export const BREAK_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds

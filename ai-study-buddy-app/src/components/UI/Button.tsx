@@ -9,6 +9,7 @@ interface ButtonProps {
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   className?: string;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 export default function Button({
@@ -17,7 +18,8 @@ export default function Button({
   variant = 'primary',
   size = 'medium',
   disabled = false,
-  className = ''
+  className = '',
+  type = 'button'
 }: ButtonProps) {
   const baseClasses = 'font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
   
@@ -50,6 +52,7 @@ export default function Button({
       className={classes}
       onClick={onClick}
       disabled={disabled}
+      type={type}
     >
       {children}
     </button>
